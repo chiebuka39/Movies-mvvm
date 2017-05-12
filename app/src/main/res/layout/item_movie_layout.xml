@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <data class="MovieItem">
+        <variable
+            name="movieItemViewModel"
+            type="com.harrricdev.edwin.movieapp.ui.movies.MovieItemViewModel" />
+    </data>
+
+    <com.harrricdev.edwin.movieapp.ui.widget.PosterImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/poster"
+        android:scaleType="centerCrop"
+        android:clickable="true"
+        bind:imageUrl="@{ movieItemViewModel.posterUrl }"
+        android:onClick="@{ () -> movieItemViewModel.clickMovieItem() }"
+        android:foreground="?attr/selectableItemBackground"
+        tools:src="@drawable/movie_placeholder"/>
+</layout>
