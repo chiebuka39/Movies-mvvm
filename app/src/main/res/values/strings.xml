@@ -9,4 +9,5 @@
 
     <string name="vote_count">%1$d votes</string>
     <string name="release_date">Release date: %1$s</string>
+    <string name="title_activity_detail">DetailActivity</string>
 </resources>

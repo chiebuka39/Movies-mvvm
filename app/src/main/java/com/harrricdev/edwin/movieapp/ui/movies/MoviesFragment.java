@@ -5,6 +5,8 @@ import com.harrricdev.edwin.movieapp.data.model.Movie;
 import com.harrricdev.edwin.movieapp.data.remote.api.MovieApiService;
 import com.harrricdev.edwin.movieapp.data.repository.MovieRemoteRepository;
 import com.harrricdev.edwin.movieapp.ui.base.BaseFragment;
+
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.harrricdev.edwin.movieapp.databinding.MovieListBinding;
+import com.harrricdev.edwin.movieapp.ui.moviedetails.DetailActivity;
 import com.harrricdev.edwin.movieapp.ui.moviedetails.MovieDetailsFragment;
 
 /**
@@ -78,10 +81,16 @@ public class MoviesFragment extends BaseFragment implements Interactor {
     public void showMovieDetails(Movie movie) {
         ///Toast.makeText(getContext(), movie.toString(), Toast.LENGTH_SHORT).show();
 
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        /*FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.container, MovieDetailsFragment.newInstance(movie.getId()));
         ft.addToBackStack(null);
-        ft.commit();
+        ft.commit();*/
+        Intent intent = new Intent(getActivity(), DetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putLong("MOVIE_ID", movie.getId());
+        intent.putExtras(bundle);
+        getActivity().startActivity(intent);
+
         //Toast.makeText(getActivity().getApplicationContext(), movie.getTitle(), Toast.LENGTH_SHORT).show();
     }
 }
