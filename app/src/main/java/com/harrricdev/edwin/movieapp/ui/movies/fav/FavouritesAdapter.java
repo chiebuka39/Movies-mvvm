@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +21,23 @@ import com.harrricdev.edwin.movieapp.databinding.FavouriteItem;
 
 public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.FavouriteViewHolder> {
 
-    private Cursor mCursor;
+    private Cursor mCursor = null;
     private Context mContext;
 
     public FavouritesAdapter(Context context){
         this.mContext = context;
+    }
+
+    public void setCursor(Cursor cursor){
+
+        Log.v("HARRY", "called");
+        if(cursor != null){
+            mCursor = cursor;
+            notifyDataSetChanged();
+            Log.v("HARRY2", cursor.getCount()+"");
+        }
+
+
     }
 
 
@@ -65,6 +78,7 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.Fa
         if (mCursor == null) {
             return 0;
         }
+        Log.v("HARRY2", mCursor.getCount()+"");
         return mCursor.getCount();
     }
 

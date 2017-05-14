@@ -28,15 +28,22 @@ import com.harrricdev.edwin.movieapp.ui.moviedetails.MovieDetailsFragment;
 
 public class MoviesFragment extends BaseFragment implements Interactor {
 
+    private static final String ARG_SORT = "MOVIEFRAGMENT.MOVIE_SORT";
     private static final String TAG = MoviesFragment.class.getName();
     private MovieListBinding binding;
 
     private MovieAdapter mAdapter;
     private MoviesViewModel mMoviesViewModel;
     private MovieRemoteRepository mMoviesRepository;
+    private String mSortKey;
 
-    public static Fragment newInstance() {
-        return new MoviesFragment();
+    public static Fragment newInstance(String sortKey) {
+        Fragment frag = new MoviesFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_SORT, sortKey);
+        frag.setArguments(args);
+        return frag;
+
     }
 
     @Override
@@ -50,11 +57,25 @@ public class MoviesFragment extends BaseFragment implements Interactor {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        retrieveSortKey(savedInstanceState);
+
         setupViewModels();
         //setupToolbar();
         setupRecyclerView();
 
-        mMoviesViewModel.start("popular");
+        mMoviesViewModel.start(mSortKey.toLowerCase());
+    }
+
+    private void retrieveSortKey(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            mSortKey = getArguments() != null ? getArguments().getString(ARG_SORT, "") : "";
+        } else {
+            mSortKey = savedInstanceState.getString(ARG_SORT, "");
+        }
+        if (mSortKey == "") {
+            throw new IllegalArgumentException("You either passed a wrong value of sort value,"
+                    + " or you did not use the newInstance convenience method");
+        }
     }
 
     private void setupToolbar() {

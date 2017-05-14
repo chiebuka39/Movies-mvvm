@@ -1,5 +1,6 @@
 package com.harrricdev.edwin.movieapp.ui.movies.fav;
 
+import android.databinding.BaseObservable;
 import android.databinding.ObservableField;
 
 import com.harrricdev.edwin.movieapp.data.db.FavouriteMovie;
@@ -10,7 +11,7 @@ import io.reactivex.Observable;
  * Created by edwin on 5/13/17.
  */
 
-public class FavouritesViewModel {
+public class FavouritesViewModel extends BaseObservable{
 
     public final ObservableField<FavouriteMovie> mFavouriteObservable = new ObservableField<>();
 

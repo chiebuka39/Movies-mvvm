@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <data class="MoviesBinding">
-        <import type="android.view.View" />
+    <data class="MoviesBinding" />
 
-        <variable
-            name="moviesViewModel"
-            type="com.harrricdev.edwin.movieapp.ui.movies.MoviesViewModel" />
-    </data>
 
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -32,58 +27,17 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <FrameLayout
+       <include layout="@layout/content_main" />
 
-           android:layout_marginTop="?attr/actionBarSize"
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                bind:movies="@{ moviesViewModel.movies }"
-                android:id="@+id/movies"/>
-
-            <!-- empty view -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="@{ moviesViewModel.emptyViewShowing ? View.VISIBLE : View.GONE }"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no_movies"/>
-
-            </LinearLayout>
-
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="@{ moviesViewModel.moviesLoading ? View.VISIBLE : View.GONE }"
-                android:layout_gravity="center"/>
-
-            <!-- empty view -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="@{ moviesViewModel.errorViewShowing ? View.VISIBLE : View.GONE }"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{ moviesViewModel.errorString }"
-                    />
-
-            </LinearLayout>
-
-        </FrameLayout>
+            android:layout_height="wrap_content"
+            app:itemBackground="@color/colorPrimary"
+            app:itemIconTint="@drawable/nav_item_color_state"
+            app:itemTextColor="@drawable/nav_item_color_state"
+            app:menu="@menu/bottom_nav"
+            android:layout_gravity="bottom"/>
 
 
     </android.support.design.widget.CoordinatorLayout>

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
@@ -11,6 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.harrricdev.edwin.movieapp.R;
 import com.harrricdev.edwin.movieapp.data.model.Movie;
@@ -20,14 +23,17 @@ import com.harrricdev.edwin.movieapp.data.repository.MovieRemoteRepository;
 import com.harrricdev.edwin.movieapp.databinding.MoviesBinding;
 import com.harrricdev.edwin.movieapp.ui.base.BaseActivity;
 import com.harrricdev.edwin.movieapp.ui.moviedetails.DetailActivity;
+import com.harrricdev.edwin.movieapp.ui.movies.fav.FavouriteFragment;
 
-public class MainActivity extends BaseActivity implements Interactor {
+public class MainActivity extends BaseActivity {
 
 
-    private MovieAdapter mAdapter;
+    /*private MovieAdapter mAdapter;
     private MoviesViewModel mMoviesViewModel;
     private MovieRemoteRepository mMoviesRepository;
-    private String selected;
+    private String selected;*/
+
+    private String dItem = "popular";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,28 +42,66 @@ public class MainActivity extends BaseActivity implements Interactor {
 
         setUpToolbar(binding);
 
-        setupViewModels(binding);
+        //setupViewModels(binding);
         //setupToolbar();
-        setupRecyclerView(binding);
+        //setupRecyclerView(binding);
 
-        selected = "popular";
+        //selected = "popular";
 
-        mMoviesViewModel.start(selected);
+        //mMoviesViewModel.start(selected);
 
 
-        /*if (savedInstanceState == null) {
-            Fragment fragment = MoviesFragment.newInstance();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.container, fragment)
-                    .commit();
-        }*/
+        if (savedInstanceState == null) {
+            changeSortFragment("popular");
+        }
+
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId()){
+                    case R.id.action_popular:
+                        if(!dItem.equalsIgnoreCase("popular")){
+                            dItem = "popular";
+                            changeSortFragment(dItem);
+                            Toast.makeText(MainActivity.this, "Popular", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    case R.id.action_rate:
+                        if(!dItem.equalsIgnoreCase("top_rated")){
+                            dItem = "top_rated";
+                            changeSortFragment(dItem);
+                            Toast.makeText(MainActivity.this, "Top Rated", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    case R.id.action_favourite:
+                        if(!dItem.equalsIgnoreCase("favourite")){
+                            dItem = "favourite";
+                            Fragment fragment = FavouriteFragment.newInstance();
+                            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                            ft.replace(R.id.container, fragment)
+                                    .commit();
+                            Toast.makeText(MainActivity.this, "favourite", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+    }
+
+    private void changeSortFragment(String sortKey) {
+        Fragment fragment = MoviesFragment.newInstance(sortKey);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, fragment)
+                .commit();
     }
 
     private void setUpToolbar(MoviesBinding binding) {
         setSupportActionBar(binding.toolbar);
     }
 
-    private void setupViewModels(MoviesBinding binding) {
+   /* private void setupViewModels(MoviesBinding binding) {
         mMoviesRepository = new
                 MovieRemoteRepository(MovieApiService.Creator.create());
 
@@ -119,7 +163,7 @@ public class MainActivity extends BaseActivity implements Interactor {
         bundle.putLong("MOVIE_ID", movie.getId());
         intent.putExtras(bundle);
         startActivity(intent);
-    }
+    }*/
 }
 
 
