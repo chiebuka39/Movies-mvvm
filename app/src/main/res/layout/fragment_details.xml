@@ -285,6 +285,28 @@
 
             </LinearLayout>
         </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_marginRight="10dp"
+            android:elevation="15dp"
+            android:layout_height="wrap_content"
+            android:onClick="@{ () -> viewModel.makeFav() }"
+            app:layout_anchor="@id/appbar"
+            app:layout_anchorGravity="bottom|end">
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:src="@drawable/ic_favorite"
+                android:layout_gravity="bottom|end"/>
+
+
+        </FrameLayout>
+
+
+
     </android.support.design.widget.CoordinatorLayout>
 
 </layout>

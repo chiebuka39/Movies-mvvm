@@ -24,6 +24,12 @@
             android:name=".ui.moviedetails.DetailActivity"
             android:label="@string/title_activity_detail"
             android:theme="@style/AppTheme.NoActionBar" />
+        
+        <provider
+            android:authorities="com.harrricdev.edwin.movieapp"
+            android:name="com.harrricdev.edwin.movieapp.data.db.MoviesContentProvider"
+            android:exported="false"
+            />
     </application>
 
 </manifest>

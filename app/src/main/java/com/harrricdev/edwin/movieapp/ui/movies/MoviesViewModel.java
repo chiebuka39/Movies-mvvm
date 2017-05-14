@@ -46,14 +46,62 @@ public class MoviesViewModel extends BaseObservable {
 
 
 
-    public void start() {
-        showMovies(movies.isEmpty());
+    public void start(String sort) {
+        showMovies(movies.isEmpty(), sort);
     }
 
-    private void showMovies(boolean showLoading) {
+    public void showMovies(boolean showLoading, String sort) {
         moviesLoading.set(showLoading);
         errorViewShowing.set(false);
         emptyViewShowing.set(false);
+        movies.clear();
+
+        if(sort.equalsIgnoreCase("popular")){
+            showPopular();
+        }else{
+            showTop();
+        }
+
+
+    }
+
+    private void showTop() {
+
+        mMoviesRepository.getTopRatedMovies()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(new DisposableObserver<List<Movie>>() {
+                    @Override
+                    public void onNext(List<Movie> value) {
+                        boolean isEmpty = value == null || value.isEmpty();
+
+                        if(!isEmpty) {
+                            movies.clear();
+                            movies.addAll(value);
+                        }
+                        emptyViewShowing.set(isEmpty);
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        errorViewShowing.set(true);
+                        moviesLoading.set(false);
+                        emptyViewShowing.set(false);
+
+                        errorString.set(getErrorMessage(e));
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        moviesLoading.set(false);
+                        errorViewShowing.set(false);
+                    }
+                });
+
+    }
+
+    private void showPopular(){
 
         mMoviesRepository.getPopularMovies()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -86,6 +134,7 @@ public class MoviesViewModel extends BaseObservable {
                         errorViewShowing.set(false);
                     }
                 });
+
     }
 
     private String getErrorMessage(Throwable e) {
@@ -99,6 +148,7 @@ public class MoviesViewModel extends BaseObservable {
         }
 
     }
+
 
 
     private void setUpChangeCallbacks() {

@@ -54,7 +54,7 @@ public class MoviesFragment extends BaseFragment implements Interactor {
         //setupToolbar();
         setupRecyclerView();
 
-        mMoviesViewModel.start();
+        mMoviesViewModel.start("popular");
     }
 
     private void setupToolbar() {

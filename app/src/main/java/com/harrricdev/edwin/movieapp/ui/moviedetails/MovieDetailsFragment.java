@@ -1,19 +1,27 @@
 package com.harrricdev.edwin.movieapp.ui.moviedetails;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.harrricdev.edwin.movieapp.R;
+import com.harrricdev.edwin.movieapp.data.db.MoviesContract;
 import com.harrricdev.edwin.movieapp.data.model.Trailer;
 import com.harrricdev.edwin.movieapp.data.remote.api.MovieApiService;
 import com.harrricdev.edwin.movieapp.data.repository.MovieRemoteRepository;
@@ -26,9 +34,14 @@ import com.harrricdev.edwin.movieapp.ui.movies.MovieAdapter;
  * Created by edwin on 5/11/17.
  */
 
-public class MovieDetailsFragment extends BaseFragment implements TrailerInteractor {
+public class MovieDetailsFragment extends BaseFragment implements TrailerInteractor,
+        DetailsInteractor, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String ARG_MOVIE_ID = "MovieDetailsFragment.MOVIE_ID";
+
+    private static final int TASK_LOADER_ID = 0;
+
+    private boolean favourited = false;
 
     private MovieDetailsBinding mBinding;
     ReviewAdapter reviewAdapter;
@@ -97,7 +110,7 @@ public class MovieDetailsFragment extends BaseFragment implements TrailerInterac
         movieRemoteRepository = new
                 MovieRemoteRepository(MovieApiService.Creator.create());
 
-        mViewModel = new MovieDetailsViewModel(movieRemoteRepository);
+        mViewModel = new MovieDetailsViewModel(movieRemoteRepository, this);
         mBinding.setViewModel(mViewModel);
         mViewModel.getMovieDetails(mMovieId);
     }
@@ -115,6 +128,18 @@ public class MovieDetailsFragment extends BaseFragment implements TrailerInterac
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getActivity().getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, this);
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putLong(ARG_MOVIE_ID, mMovieId);
         super.onSaveInstanceState(outState);
@@ -126,5 +151,98 @@ public class MovieDetailsFragment extends BaseFragment implements TrailerInterac
         String url = "https://www.youtube.com/watch?v="+ trailer.getKey();
         Intent intent = new Intent(Intent.ACTION_VIEW , Uri.parse(url));
         getActivity().startActivity(intent);
+    }
+
+    @Override
+    public void makeFavourite(String title) {
+        ContentValues contentValues = new ContentValues();
+        // Put the task description and selected mPriority into the ContentValues
+        contentValues.put(MoviesContract.MovieEntry.COLUMN_TITLE, title);
+        contentValues.put(MoviesContract.MovieEntry.COLUMN_NUMBER, mMovieId+"");
+
+        // Insert the content values via a ContentResolver
+        Uri uri = getActivity().getContentResolver().insert(MoviesContract.MovieEntry.CONTENT_URI, contentValues);
+
+        // Display the URI that's returned with a Toast
+        // [Hint] Don't forget to call finish() to return to MainActivity after this insert is complete
+        if(uri != null) {
+            Toast.makeText(getActivity().getBaseContext(), "Success", Toast.LENGTH_LONG).show();
+        }
+        //Toast.makeText(getActivity().getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<Cursor>(getActivity()) {
+            Cursor mfav = null;
+
+            // onStartLoading() is called when a loader first starts loading data
+            @Override
+            protected void onStartLoading() {
+                if (mfav != null) {
+                    // Delivers any previously loaded data immediately
+                    deliverResult(mfav);
+                } else {
+                    // Force a new load
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public Cursor loadInBackground() {
+                try {
+                    return getActivity().getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI,
+                            null,
+                            MoviesContract.MovieEntry.COLUMN_NUMBER+ " = ?",
+                            new String[]{mMovieId+""},
+                            null);
+
+                } catch (Exception e) {
+                    Log.e("HARRY", "Failed to asynchronously load data.");
+                    e.printStackTrace();
+                    return null;
+                }
+                //PRIORITY + " = ?"
+            }
+
+            public void deliverResult(Cursor data) {
+                mfav = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        favourited = getFavourited(data);
+        Toast.makeText(getActivity().getApplication(), favourited+"", Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean getFavourited(Cursor mCursor) {
+
+        int idIndex = mCursor.getColumnIndex(MoviesContract.MovieEntry._ID);
+        int titleIndex = mCursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_TITLE);
+        int numberIndex = mCursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_NUMBER);
+
+
+        // Determine the values of the wanted data
+
+        String number = "";
+        if(mCursor.moveToFirst()){
+            number = mCursor.getString(numberIndex);
+        }
+
+
+
+        if(number.isEmpty()){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        favourited = false;
     }
 }

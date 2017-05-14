@@ -47,9 +47,12 @@ public class MovieDetailsViewModel extends MovieViewModel {
 
     private final MoviesRepository mMoviesRepository;
 
-    public MovieDetailsViewModel(MoviesRepository moviesRepository) {
+    private DetailsInteractor mDetailsInteractor;
+
+    public MovieDetailsViewModel(MoviesRepository moviesRepository, DetailsInteractor interactor) {
         super(moviesRepository);
         mMoviesRepository = moviesRepository;
+        mDetailsInteractor = interactor;
         setUpChangeCallbacks();
     }
 
@@ -163,6 +166,15 @@ public class MovieDetailsViewModel extends MovieViewModel {
     }
 
     private void setUpTrailers() {
+
+    }
+
+    public void makeFav(){
+        String title = movieTitle.get();
+
+        if( !title.isEmpty()){
+            mDetailsInteractor.makeFavourite(title);
+        }
 
     }
 

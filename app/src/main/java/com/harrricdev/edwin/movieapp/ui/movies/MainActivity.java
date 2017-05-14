@@ -1,51 +1,76 @@
 package com.harrricdev.edwin.movieapp.ui.movies;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+
+
+import android.support.v7.widget.GridLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.harrricdev.edwin.movieapp.R;
+import com.harrricdev.edwin.movieapp.data.model.Movie;
 import com.harrricdev.edwin.movieapp.data.remote.api.MovieApiService;
 import com.harrricdev.edwin.movieapp.data.repository.MovieRemoteRepository;
-import com.harrricdev.edwin.movieapp.databinding.ActivityMainBinding;
+
+import com.harrricdev.edwin.movieapp.databinding.MoviesBinding;
 import com.harrricdev.edwin.movieapp.ui.base.BaseActivity;
+import com.harrricdev.edwin.movieapp.ui.moviedetails.DetailActivity;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements Interactor {
 
 
-    MoviesViewModel moviesViewModel;
+    private MovieAdapter mAdapter;
+    private MoviesViewModel mMoviesViewModel;
     private MovieRemoteRepository mMoviesRepository;
+    private String selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        //setContentView(R.layout.activity_main);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        MoviesBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
         setUpToolbar(binding);
 
+        setupViewModels(binding);
+        //setupToolbar();
+        setupRecyclerView(binding);
+
+        selected = "popular";
+
+        mMoviesViewModel.start(selected);
 
 
-        //setSupportActionBar(toolbar);
-
-        if (savedInstanceState == null) {
+        /*if (savedInstanceState == null) {
             Fragment fragment = MoviesFragment.newInstance();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.container, fragment)
                     .commit();
-        }
+        }*/
     }
 
-    private void setUpToolbar(ActivityMainBinding binding) {
+    private void setUpToolbar(MoviesBinding binding) {
         setSupportActionBar(binding.toolbar);
+    }
+
+    private void setupViewModels(MoviesBinding binding) {
+        mMoviesRepository = new
+                MovieRemoteRepository(MovieApiService.Creator.create());
+
+        mMoviesViewModel = new MoviesViewModel(this, mMoviesRepository);
+        binding.setMoviesViewModel(mMoviesViewModel);
+
+    }
+
+    private void setupRecyclerView(MoviesBinding binding) {
+        mAdapter = new MovieAdapter(mMoviesRepository, this);
+
+        binding.movies.setLayoutManager(new GridLayoutManager(this, 2));
+        binding.movies.setAdapter(mAdapter);
     }
 
     @Override
@@ -68,9 +93,33 @@ public class MainActivity extends BaseActivity {
             return true;
         }
 
+        if (id == R.id.action_popular) {
+            if(!selected.equalsIgnoreCase("popular")){
+                selected = "popular";
+                mMoviesViewModel.showMovies(true,selected);
+            }
+            return true;
+        }
+
+        if (id == R.id.action_rate) {
+            if(!selected.equalsIgnoreCase("rate")){
+                selected = "rate";
+                mMoviesViewModel.showMovies(true,selected);
+            }
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void showMovieDetails(Movie movie) {
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putLong("MOVIE_ID", movie.getId());
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
 }
 
 

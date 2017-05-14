@@ -23,7 +23,7 @@ public interface MovieApiService {
     @GET("movie/popular")
     Observable<MovieList> getPopularMovies(@Query("api_key") String apiKey);
 
-    @GET("movie/top-rated")
+    @GET("movie/top_rated")
     Observable<MovieList> getTopRatedMovies(@Query("api_key") String apiKey);
 
     /**
