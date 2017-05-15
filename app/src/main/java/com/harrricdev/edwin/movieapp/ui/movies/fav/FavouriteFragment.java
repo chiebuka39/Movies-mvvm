@@ -53,7 +53,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onResume() {
         super.onResume();
-        viewModel = new FavouritesListViewModel(getContext());
+        //viewModel = new FavouritesListViewModel(getContext());
        getActivity().getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, this);
     }
 
@@ -84,7 +84,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
 
     private void setupViewModels(){
 
-        viewModel = new FavouritesListViewModel(getContext());
+        //viewModel = new FavouritesListViewModel(getContext());
         binding.setFavouritesViewModel(viewModel);
     }
 
@@ -158,5 +158,6 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoaderReset(Loader<Cursor> loader) {
         viewModel.setCursor(null);
     }
+
 
 }

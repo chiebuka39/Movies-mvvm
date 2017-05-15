@@ -28,6 +28,7 @@ public class MoviesContentProvider extends ContentProvider {
         UriMatcher mUriMatcher = new UriMatcher(android.content.UriMatcher.NO_MATCH);
 
         mUriMatcher.addURI(MoviesContract.AUTHORITY, MoviesContract.PATH_MOVIES, MOVIES);
+        mUriMatcher.addURI(MoviesContract.AUTHORITY, MoviesContract.PATH_MOVIES+ "/#", MOVIES_WITH_ID);
 
         return mUriMatcher;
     }

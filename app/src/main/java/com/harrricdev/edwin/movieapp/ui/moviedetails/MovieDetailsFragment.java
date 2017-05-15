@@ -29,6 +29,7 @@ import com.harrricdev.edwin.movieapp.data.repository.MovieRemoteRepository;
 import com.harrricdev.edwin.movieapp.databinding.MovieDetailsBinding;
 import com.harrricdev.edwin.movieapp.ui.base.BaseFragment;
 import com.harrricdev.edwin.movieapp.ui.movies.MovieAdapter;
+import com.harrricdev.edwin.movieapp.ui.movies.fav.FavouriteFragment;
 
 /**
  * Created by edwin on 5/11/17.
@@ -40,6 +41,8 @@ public class MovieDetailsFragment extends BaseFragment implements TrailerInterac
     private static final String ARG_MOVIE_ID = "MovieDetailsFragment.MOVIE_ID";
 
     private static final int TASK_LOADER_ID = 0;
+
+    private int theMovieId = 0;
 
     private boolean favourited = false;
 
@@ -155,20 +158,33 @@ public class MovieDetailsFragment extends BaseFragment implements TrailerInterac
 
     @Override
     public void makeFavourite(String title) {
-        ContentValues contentValues = new ContentValues();
-        // Put the task description and selected mPriority into the ContentValues
-        contentValues.put(MoviesContract.MovieEntry.COLUMN_TITLE, title);
-        contentValues.put(MoviesContract.MovieEntry.COLUMN_NUMBER, mMovieId+"");
+        if(!favourited){
+            ContentValues contentValues = new ContentValues();
+            // Put the task description and selected mPriority into the ContentValues
+            contentValues.put(MoviesContract.MovieEntry.COLUMN_TITLE, title);
+            contentValues.put(MoviesContract.MovieEntry.COLUMN_NUMBER, mMovieId+"");
 
-        // Insert the content values via a ContentResolver
-        Uri uri = getActivity().getContentResolver().insert(MoviesContract.MovieEntry.CONTENT_URI, contentValues);
+            // Insert the content values via a ContentResolver
+            Uri uri = getActivity().getContentResolver().insert(MoviesContract.MovieEntry.CONTENT_URI, contentValues);
 
-        // Display the URI that's returned with a Toast
-        // [Hint] Don't forget to call finish() to return to MainActivity after this insert is complete
-        if(uri != null) {
-            Toast.makeText(getActivity().getBaseContext(), "Success", Toast.LENGTH_LONG).show();
+            // Display the URI that's returned with a Toast
+            // [Hint] Don't forget to call finish() to return to MainActivity after this insert is complete
+            if(uri != null) {
+                Toast.makeText(getActivity().getBaseContext(), "Success", Toast.LENGTH_LONG).show();
+            }
+            //Toast.makeText(getActivity().getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+        }else{
+            int id = 0;
+            String stringId = Integer.toString(theMovieId);
+            Uri uri = MoviesContract.MovieEntry.CONTENT_URI;
+            uri = uri.buildUpon().appendPath(stringId).build();
+            id = getActivity().getContentResolver().delete(uri, null, null);
+            //getActivity().getSupportLoaderManager().restartLoader(0, null, FavouriteFragment.class);
+            if(id != 0) {
+                Toast.makeText(getActivity().getBaseContext(), "Successfully deleted", Toast.LENGTH_LONG).show();
+            }
         }
-        //Toast.makeText(getActivity().getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -230,6 +246,8 @@ public class MovieDetailsFragment extends BaseFragment implements TrailerInterac
         String number = "";
         if(mCursor.moveToFirst()){
             number = mCursor.getString(numberIndex);
+            theMovieId = mCursor.getInt(idIndex);
+            Toast.makeText(getActivity(), theMovieId+"", Toast.LENGTH_SHORT).show();
         }
 
 
