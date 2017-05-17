@@ -8,14 +8,18 @@
             type="com.harrricdev.edwin.movieapp.ui.movies.MovieItemViewModel" />
     </data>
 
-    <com.harrricdev.edwin.movieapp.ui.widget.PosterImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/poster"
-        android:scaleType="centerCrop"
-        android:clickable="true"
-        bind:imageUrl="@{ movieItemViewModel.posterUrl }"
-        android:onClick="@{ () -> movieItemViewModel.clickMovieItem() }"
-        android:foreground="?attr/selectableItemBackground"
-        tools:src="@drawable/movie_placeholder"/>
+ 
+
+        <com.harrricdev.edwin.movieapp.ui.widget.PosterImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/poster"
+            android:scaleType="centerCrop"
+            android:clickable="true"
+            bind:imageUrl="@{ movieItemViewModel.posterUrl }"
+            android:onClick="@{ () -> movieItemViewModel.clickMovieItem() }"
+            android:foreground="?attr/selectableItemBackground"
+            tools:src="@drawable/movie_placeholder"/>
+
+
 </layout>

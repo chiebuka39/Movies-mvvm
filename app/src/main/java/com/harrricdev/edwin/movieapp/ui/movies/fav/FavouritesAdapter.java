@@ -3,6 +3,7 @@ package com.harrricdev.edwin.movieapp.ui.movies.fav;
 import android.content.Context;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +15,8 @@ import com.harrricdev.edwin.movieapp.R;
 import com.harrricdev.edwin.movieapp.data.db.FavouriteMovie;
 import com.harrricdev.edwin.movieapp.data.db.MoviesContract;
 import com.harrricdev.edwin.movieapp.databinding.FavouriteItem;
+import com.harrricdev.edwin.movieapp.utils.ImageSaver;
+import com.harrricdev.edwin.movieapp.utils.OfflineImage;
 
 /**
  * Created by edwin on 5/13/17.
@@ -62,13 +65,13 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.Fa
         // Determine the values of the wanted data
         final int id = mCursor.getInt(idIndex);
         String title = mCursor.getString(titleIndex);
-        String number = mCursor.getString(titleIndex);
+        String number = mCursor.getString(numberIndex);
 
         FavouriteMovie movie = new FavouriteMovie(id,title,number);
 
         final FavouritesViewModel favouritesViewModel = new FavouritesViewModel();
         favouritesViewModel.setFavouriteMovie(movie);
-        holder.setFavouritesiewModel(favouritesViewModel);
+        holder.setFavouritesiewModel(favouritesViewModel, number);
 
 
     }
@@ -78,7 +81,7 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.Fa
         if (mCursor == null) {
             return 0;
         }
-        Log.v("HARRY2", mCursor.getCount()+"");
+
         return mCursor.getCount();
     }
 
@@ -91,9 +94,16 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.Fa
             this.favouriteItem = favouriteItem;
         }
 
-        public void setFavouritesiewModel(@NonNull FavouritesViewModel favouritesiewModel){
+        public void setFavouritesiewModel(@NonNull FavouritesViewModel favouritesiewModel, String number){
             favouriteItem.setFav(favouritesiewModel);
+            Bitmap bitmap = new ImageSaver(favouriteItem.favImage.getContext()).
+                    setFileName(number).
+                    setDirectoryName("images").
+                    load();
+
+            favouriteItem.favImage.setImageBitmap(bitmap);
             favouriteItem.executePendingBindings();
+
         }
     }
 }

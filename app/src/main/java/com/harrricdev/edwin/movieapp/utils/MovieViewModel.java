@@ -61,6 +61,10 @@ public class MovieViewModel extends BaseObservable {
         return mObservableMovie.get();
     }
 
+    public String getPosterUrl(){
+        return posterUrl.get();
+    }
+
 
     private String getTitle(@NonNull Movie movie) {
         return movie.getTitle();

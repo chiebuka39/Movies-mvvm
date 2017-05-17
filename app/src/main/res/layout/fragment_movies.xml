@@ -16,15 +16,34 @@
 
 
         <FrameLayout
+            android:id="@+id/root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
            >
 
+
+
             <android.support.v7.widget.RecyclerView
+                android:paddingTop="?attr/actionBarSize"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:elevation="1dp"
+                android:clipToPadding="false"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbars="vertical"
                 bind:movies="@{ moviesViewModel.movies }"
                 android:id="@+id/movies"/>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/mainToolbar"
+                android:title="movies"
+                style="@style/Widget.Movies.HomeToolbar"
+                android:elevation="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                 />
 
             <!-- empty view -->
             <LinearLayout
@@ -35,6 +54,7 @@
                 android:gravity="center">
 
                 <TextView
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/no_movies"/>

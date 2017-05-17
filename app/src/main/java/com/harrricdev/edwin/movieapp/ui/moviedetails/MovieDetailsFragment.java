@@ -4,15 +4,15 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.databinding.ObservableField;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.harrricdev.edwin.movieapp.R;
 import com.harrricdev.edwin.movieapp.data.db.MoviesContract;
 import com.harrricdev.edwin.movieapp.data.model.Trailer;
@@ -28,8 +34,14 @@ import com.harrricdev.edwin.movieapp.data.repository.MovieRemoteRepository;
 
 import com.harrricdev.edwin.movieapp.databinding.MovieDetailsBinding;
 import com.harrricdev.edwin.movieapp.ui.base.BaseFragment;
-import com.harrricdev.edwin.movieapp.ui.movies.MovieAdapter;
-import com.harrricdev.edwin.movieapp.ui.movies.fav.FavouriteFragment;
+import com.harrricdev.edwin.movieapp.utils.GlideUtils;
+import com.harrricdev.edwin.movieapp.utils.ImageSaver;
+import com.harrricdev.edwin.movieapp.utils.OfflineImage;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 /**
  * Created by edwin on 5/11/17.
@@ -159,10 +171,39 @@ public class MovieDetailsFragment extends BaseFragment implements TrailerInterac
     @Override
     public void makeFavourite(String title) {
         if(!favourited){
+            //Bitmap bitmap = null;
+
+
+                Glide.with(getActivity())
+                            .load(mViewModel.getPosterUrl())
+                            .into(new SimpleTarget<GlideDrawable>() {
+                                @Override
+                                public void onResourceReady(final GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                                    new AsyncTask<Void, Void, Void>() {
+                                        @Override
+                                        protected Void doInBackground(Void... params) {
+                                            final Bitmap bitmap = GlideUtils.getBitmap(resource);
+                                            new ImageSaver(getActivity()).
+                                                    setFileName(mMovieId+"").
+                                                    setDirectoryName("images").
+                                                    save(bitmap);
+                                            return null;
+                                        }
+                                    }.execute();
+                                }
+                            });
+
+
+
+            //OfflineImage.saveToInternalStorage(bitmap, getActivity().getApplicationContext(), mMovieId+"");
+
+
             ContentValues contentValues = new ContentValues();
             // Put the task description and selected mPriority into the ContentValues
             contentValues.put(MoviesContract.MovieEntry.COLUMN_TITLE, title);
             contentValues.put(MoviesContract.MovieEntry.COLUMN_NUMBER, mMovieId+"");
+            Log.v("HARRY5", mMovieId+"");
+
 
             // Insert the content values via a ContentResolver
             Uri uri = getActivity().getContentResolver().insert(MoviesContract.MovieEntry.CONTENT_URI, contentValues);
@@ -263,4 +304,22 @@ public class MovieDetailsFragment extends BaseFragment implements TrailerInterac
     public void onLoaderReset(Loader<Cursor> loader) {
         favourited = false;
     }
+
+    private RequestListener posterListener = new RequestListener<String, GlideDrawable>() {
+        @Override
+        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+            return false;
+        }
+
+        @Override
+        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+            final Bitmap bitmap = GlideUtils.getBitmap(resource);
+            OfflineImage.saveToInternalStorage(bitmap, getActivity().getApplicationContext(),
+                    mMovieId+"");
+            Log.v("HARRY3", "saved");
+            return false;
+        }
+    };
+
+
 }
